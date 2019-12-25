@@ -10,7 +10,7 @@ export const i18n = {
   button: {
     add: "添加",
     delete: "删除",
-    modify: "修改",
+    modify: "编辑",
     assign: "授权"
   },
   system: "Fashion管理系统",

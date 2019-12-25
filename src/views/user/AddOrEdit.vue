@@ -28,22 +28,22 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="姓名">
+          <el-form-item label="姓名" prop="RealName">
             <el-input v-model="form.RealName" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="性别">
+          <el-form-item label="性别" prop="Sex">
             <el-radio-group v-model="form.Sex">
               <el-radio class="radio" :label="1">男</el-radio>
               <el-radio class="radio" :label="0">女</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="年龄">
+          <el-form-item label="年龄" prop="Age">
             <el-input-number v-model="form.Age" :min="0" :max="100"></el-input-number>
           </el-form-item>
-          <el-form-item label="生日">
+          <el-form-item label="生日" prop="Birthday">
             <el-date-picker type="date" placeholder="选择日期" v-model="form.Birthday"></el-date-picker>
           </el-form-item>
-          <el-form-item label="地址">
+          <el-form-item label="地址" prop="Address">
             <el-input type="textarea" v-model="form.Address"></el-input>
           </el-form-item>
           <el-form-item label="是否启用">
@@ -82,7 +82,8 @@ export default {
       id: -1,
       rules: {
         LoginName: [{ required: true, message: '请输入登录名', trigger: 'blur' }],
-        Password: []
+        Password: [],
+        Birthday: [{ required: true, message: '请选择出生日期', trigger: 'blur' }]
       },
       uploadUrl: '/api/upload/upload-image'
     }

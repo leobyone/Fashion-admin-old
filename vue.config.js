@@ -3,7 +3,8 @@
 // const UglifyJsPlugin = require("uglifyjs-webpack-plugin")
 module.exports = {
   publicPath: "/",
-
+  // 输出文件目录
+  outputDir: "dist",
   pages: {
     index: {
       // page 的入口
@@ -33,21 +34,27 @@ module.exports = {
   runtimeCompiler: false,
 
   devServer: {
-    port: 2364, // 端口号
-    host: "localhost",
-    https: false, // https:{type:Boolean}
+    // port: 2364, // 端口号
+    // host: "localhost",
+    // https: false, // https:{type:Boolean}
+    // open: true, //配置自动启动浏览器
     open: true, //配置自动启动浏览器
+    host: "127.0.0.1", //主机
+    port: 6688, // 端口号自定义
+    https: false, //是否开启https安全协议
+    hotOnly: false, // https:{type:Boolean}
     // before: function(app) {
     //   app.get("./config/mobile-app-config.json", function(req, res) {
     //     window.appConfig = res;
     //     console.log(res);
     //   });
     // },
-    // 第三方api调用代理
+    //第三方api调用代理
     proxy: {
       "/api": {
         target: "http://localhost:62540",
-        changeOrigin: true,
+        ws: true,
+        changeOrigin: true, //允许跨域
         pathRewrite: { "^/apb": "" }
       }
     }

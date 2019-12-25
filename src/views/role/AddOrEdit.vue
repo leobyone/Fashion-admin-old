@@ -12,10 +12,10 @@
           <el-form-item label="角色名称" prop="Name">
             <el-input v-model="form.Name"></el-input>
           </el-form-item>
-          <el-form-item label="是否启用">
+          <el-form-item label="是否启用" prop="Enabled">
             <el-switch v-model="form.Enabled"></el-switch>
           </el-form-item>
-          <el-form-item label="描述">
+          <el-form-item label="描述" prop="Description">
             <el-input v-model="form.Description"></el-input>
           </el-form-item>
           <el-form-item>

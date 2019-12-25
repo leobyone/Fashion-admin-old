@@ -95,7 +95,7 @@ export default {
       this.$router.push({ name: 'addOrEditRole', params: { id: id } });
     },
     // 授权
-    handleAssign(row) {
+    handleAssign() {
       if (!this.selectedRow) {
         this.$message({ message: "请先选择要授权的角色", type: "warning" });
         return;
@@ -105,7 +105,7 @@ export default {
       this.$router.push({ name: 'assignPermission', params: { id: id } });
     },
     // 删除
-    handleDelete(index, row) {
+    handleDelete() {
       if (!this.selectedRow) {
         this.$message({ message: "请先选择要删除的数据", type: "warning" });
         return;

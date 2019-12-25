@@ -57,6 +57,7 @@
   </div>
 </template>
 <script>
+import store from '../../store';
 import bus from '../common/bus';
 export default {
   data() {
@@ -77,8 +78,11 @@ export default {
     },
     avatar() {
       let userInfo = JSON.parse(window.localStorage.user ? window.localStorage.user : null);
-      let avatar = userInfo.Avatar;
-      return avatar ? avatar : "../../../assets/img/img.jpg";
+      if (userInfo) {
+        return userInfo.Avatar;
+      }
+
+      return "../../../assets/img/img.jpg";
     }
   },
   methods: {
@@ -91,7 +95,11 @@ export default {
     // 用户名下拉菜单选择事件
     handleCommand(command) {
       if (command == 'loginout') {
-        window.localStorage.user = null;
+        store.commit("saveToken", "");
+        store.commit("saveTokenExpire", "");
+        store.commit("saveTagsData", "");
+        window.localStorage.removeItem("user");
+        window.localStorage.removeItem("NavigationBar");
         this.$router.push('/login');
       }
     },

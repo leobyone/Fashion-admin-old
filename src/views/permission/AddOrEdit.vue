@@ -17,10 +17,10 @@
               <el-input v-model="form.Code" auto-complete="off"></el-input>
             </el-tooltip>
           </el-form-item>
-          <el-form-item label="图标">
+          <el-form-item label="图标" prop="Icon">
             <el-input v-model="form.Icon"></el-input>
           </el-form-item>
-          <el-form-item label="方法">
+          <el-form-item label="方法" prop="Action">
             <el-input v-model="form.Action"></el-input>
           </el-form-item>
           <el-form-item prop="ParentId" label="父级菜单" width="">
@@ -41,7 +41,7 @@
           <el-form-item label="描述" prop="Description">
             <el-input v-model="form.Description" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="是否启用">
+          <el-form-item label="是否启用" prop="Enabled">
             <el-switch v-model="form.Enabled"></el-switch>
           </el-form-item>
           <el-form-item prop="IsButton" label="是否按钮" width="" sortable>

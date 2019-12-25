@@ -12,10 +12,10 @@
           <el-form-item label="接口名称" prop="Name">
             <el-input v-model="form.Name"></el-input>
           </el-form-item>
-          <el-form-item label="接口地址">
+          <el-form-item label="接口地址" prop="LinkUrl">
             <el-input v-model="form.LinkUrl"></el-input>
           </el-form-item>
-          <el-form-item label="是否启用">
+          <el-form-item label="是否启用" prop="Enabled">
             <el-switch v-model="form.Enabled"></el-switch>
           </el-form-item>
           <el-form-item>
