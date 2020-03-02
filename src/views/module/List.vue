@@ -86,6 +86,7 @@ export default {
     },
     // 编辑
     handleEdit() {
+      debugger
       if (!this.selectedRow) {
         this.$message({ message: "请先选择要编辑的数据", type: "warning" });
         return;

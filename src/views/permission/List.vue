@@ -103,10 +103,11 @@ export default {
     },
     // 添加
     handleAdd() {
-      this.$router.push({ name: 'addOrEditPermission', params: { id: id } });
+      this.$router.push({ name: 'addOrEditPermission', params: { id: 0 } });
     },
     // 编辑
     handleEdit(index, row) {
+      debugger
       if (!this.selectedRow) {
         this.$message({ message: "请先选择要编辑的数据", type: "warning" });
         return;

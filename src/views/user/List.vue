@@ -35,6 +35,7 @@
 <script>
 import userApi from '../../api/user.js'
 import roleApi from '../../api/role.js'
+import util from '../../lib/util.js'
 export default {
   name: 'user',
   data() {
@@ -57,7 +58,7 @@ export default {
     toolBar: () => import('@/components/common/ToolBar.vue')
   },
   methods: {
-    callBack(button){
+    callBack(button) {
       this.keyword = button.keyword;
       this[button.action].apply(this, button);
     },
@@ -74,7 +75,14 @@ export default {
     getData() {
       let that = this;
       that.loading = true;
-      userApi.getPageList({ page: that.cur_page, size: that.size, keyword: that.keyword }).then(res => {
+      let conditions = [{
+        Field: "IsDeleted",
+        DataType: util.query.dataType.bool,
+        Option: util.query.opt.eq,
+        Value: false
+      }];
+
+      userApi.getPageList({ page: that.cur_page, size: that.size, conditions: util.query.convert(conditions), sorts: util.query.convert([]) }).then(res => {
         that.tableData = res.data.data.data;
         that.total = res.data.data.dataCount;
       }).catch(err => {
@@ -94,8 +102,8 @@ export default {
     },
     // 编辑
     handleEdit() {
-      if(!this.selectedRow){
-        this.$message({message:"请先选择要编辑的数据", type: "warning"});
+      if (!this.selectedRow) {
+        this.$message({ message: "请先选择要编辑的数据", type: "warning" });
         return;
       }
       let id = this.selectedRow.Id;
@@ -103,8 +111,8 @@ export default {
     },
     // 删除
     handleDelete() {
-      if(!this.selectedRow){
-        this.$message({message:"请先选择要删除的数据", type: "warning"});
+      if (!this.selectedRow) {
+        this.$message({ message: "请先选择要删除的数据", type: "warning" });
         return;
       }
 

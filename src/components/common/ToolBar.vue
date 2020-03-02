@@ -35,7 +35,6 @@ export default {
     },
     //获取授权按钮
     getButtonList() {
-      debugger
       let that = this;
       let path = this.$route.path.toLowerCase();
       let navigationBar = JSON.parse(window.localStorage.NavigationBar ? window.localStorage.NavigationBar : null);

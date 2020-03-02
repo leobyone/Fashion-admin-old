@@ -144,6 +144,24 @@ const routes = [
             }
           }
         ]
+      },
+      {
+        path: "banner",
+        component: resolve => require(["@/views/banner/Index.vue"], resolve),
+        meta: {
+          title: "接口管理",
+          requireAuth: true // 添加该字段，表示进入这个路由是需要登录的
+        },
+        children: [
+          {
+            path: "list",
+            component: resolve => require(["@/views/banner/List.vue"], resolve),
+            meta: {
+              title: "Banner列表",
+              requireAuth: true // 添加该字段，表示进入这个路由是需要登录的
+            }
+          }
+        ]
       }
     ]
   },

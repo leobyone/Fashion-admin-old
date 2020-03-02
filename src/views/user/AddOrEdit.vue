@@ -13,11 +13,7 @@
             <el-input v-model="form.LoginName"></el-input>
           </el-form-item>
           <el-form-item label="头像" prop="Avatar">
-            <el-upload class="avatar-uploader" :action="uploadUrl" :show-file-list="false"
-              :before-upload="beforeAvatarUpload" :http-request="uploadImage">
-              <img v-if="form.Avatar" :src="form.Avatar" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
+            <image-upload @callBack="callBack"></image-upload>
           </el-form-item>
           <el-form-item label="密码" prop="Password" v-if="id === 0">
             <el-input v-model="form.Password" show-password auto-complete="off"></el-input>
@@ -90,6 +86,9 @@ export default {
   },
   computed: {
   },
+  components: {
+    imageUpload: () => import('@/components/common/upload/UploadImage.vue')
+  },
   methods: {
     init() {
       if (this.id > 0) {
@@ -138,36 +137,8 @@ export default {
         })
       })
     },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/gif';
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return isJPG && isLt2M;
-    },
-    //上传头像
-    uploadImage(params) {
-      let img = new FormData()
-      img.append('file', params.file)
-      let conf = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-
-      uploadApi.uploadImg(img, conf).then(res => {
-        let ret = res.data;
-        if (ret.success) {
-          this.form.Avatar = ret.data;
-        } else {
-          this.$message.error('上传失败!');
-        }
-      })
+    callBack(url) {
+      this.form.Avatar = url;
     },
     // 提交保存
     onSubmit() {
