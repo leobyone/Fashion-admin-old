@@ -57,8 +57,8 @@
   </div>
 </template>
 <script>
-import store from '../../store';
-import bus from '../common/bus';
+import store from '@/store';
+import bus from '@/components/common/bus';
 export default {
   data() {
     return {

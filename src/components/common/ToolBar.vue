@@ -1,19 +1,8 @@
 <template>
-  <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-    <el-form :inline="true" @submit.native.prevent>
-      <el-form-item>
-        <el-input v-model="keyword" :placeholder="$t('i18n.keyword')" class="handle-input mr10"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="searchCallBack">{{$t('i18n.search')}}</el-button>
-      </el-form-item>
-      <!-- 这个就是当前页面内，所有的btn列表 -->
-      <el-form-item v-for="item in buttonList" :key="item.id">
-        <!-- 这里触发点击事件 -->
-        <el-button type="primary" :icon="item.icon" @click="callBack(item)">{{item.name}}</el-button>
-      </el-form-item>
-    </el-form>
-  </el-col>
+  <el-button-group>
+    <el-button v-for="item in buttonList" size="small" type="primary" :icon="item.icon" :key="item.id"
+      @click="callBack(item.action)">{{item.name}}</el-button>
+  </el-button-group>
 </template>
 <script>
 import { i18n } from '../../locale/zh-CN'
@@ -21,17 +10,13 @@ export default {
   name: "Toolbar",
   data() {
     return {
-      keyword: "", //双向绑定搜索内容,
       buttonList: [],
       button: i18n.button
     };
   },
   methods: {
-    callBack(item) {
-      this.$emit("callBack", item); //将值传给父组件
-    },
-    searchCallBack() {
-      this.$emit("search", this.keyword); //将值传给父组件
+    callBack(action) {
+      this.$emit("callBack", action); //将值传给父组件
     },
     //获取授权按钮
     getButtonList() {

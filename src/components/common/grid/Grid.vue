@@ -2,22 +2,24 @@
   <div class="io-grid" v-loading="loading">
     <el-row class="g_search_nav">
       <el-col :span="24" class="io-left io-left-div">
-        <slot name="banner" class="io-left"> </slot>
+        <!--过滤组件-->
         <grid-filter :initColumns="initColumns" v-if="showFilter" :gridID="gridID" @filterCallback="filerChange"
-          class="io-right">
+          class="io-left">
         </grid-filter>
+        <!--操作按钮组件-->
+        <div class="io-right">
+          <tool-bar @callBack="eventCallBack"></tool-bar>
+        </div>
       </el-col>
     </el-row>
     <div class="c-grid-table el-row">
       <el-table class="pc-table-bgcolor" @selection-change="selectionChange" :border="border" :data="grid.data"
-        @sort-change="sortChange" @cell-click="cellClick">
+        @sort-change="sortChange" @cell-click="cellClick" @current-change="handleSelect" highlight-current-row>
         <el-table-column type="selection" width="40" v-if="showMulitSelect"> </el-table-column>
         <el-table-column v-for="(column, index) in columns" :prop="column.prop" :label="column.label"
           :sortable="column.sortable" :width="column.width" :key="index">
           <template slot-scope="scope">
             <div v-if="column.type == 'link'" class="grid_link_cell"> {{ scope.row[column.prop] }} </div>
-            <div v-if="column.type == 'username'" class="grid_link_cell" @click="showUser(scope.row)">
-              {{ scope.row[column.prop] }} </div>
             <div v-if="column.type == '' || column.type == 'string' || column.type == 'num'">
               {{ scope.row[column.prop] }}</div>
             <div v-if="column.type == 'date'">{{ scope.row[column.prop] | date }}</div>
@@ -25,7 +27,6 @@
             <div v-if="column.type == 'formatter'">{{ column.formatter(scope.row[column.prop]) }}</div>
             <div v-if="column.type == 'html'" v-html="column.formatter(scope.row[column.prop],scope.row)"></div>
             <div class="io-center" v-if="column.type == 'boolean'" style="width:100%">
-              <!--i :class="{'el-icon-circle-check-outline d-i-yes': scope.row[column.prop],'el-icon-remove-outline d-i-no':!scope.row[column.prop]}"></i-->
               <i
                 :class="{ 'el-icon-check d-i-yes': scope.row[column.prop], 'el-icon-remove-outline d-i-no': !scope.row[column.prop] }"></i>
             </div>
@@ -43,59 +44,41 @@
   </div>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex';
-import { GRID_FILTER } from '../../mutation-types';
+import { GRID_FILTER } from '@/mutation-types';
+import ajax from '@/api/index';
+import { i18n } from '@/locale/zh-CN'
 
 export default {
   props: {
     initParams: { default: null },
-    initColumns: {
-      type: Array,
-      default: () => {
-        return [];
-      }
-    },
-    // initSort: { default: {} },
-    initData: {
-      type: Array,
-      default: () => {
-        return [];
-      }
-    },
+    initColumns: { type: Array, default: () => { return []; } },
+    initData: { type: Array, default: () => { return []; } },
     api: { default: '' },
     gridID: { default: '' },
     auto: { default: true },
     showFilter: { default: true },
     showMulitSelect: { default: false },
     border: { default: true },
-    pageSizes: {
-      type: Array,
-      default: () => {
-        return [10, 20, 50];
-      }
-    }
+    pageSizes: { type: Array, default: () => { return [10, 20, 50]; } }
   },
   data() {
     return {
       loading: false,
-      grid: { data: [], total: 0, filter: null }
+      grid: { data: [], total: 0, filter: null },
+      selectRow: {}
     };
   },
   components: {
-    gridFilter: () => import('@/components/common/GridFilter.vue')
+    gridFilter: () => import('@/components/common/filter/GridFilter.vue'),
+    toolBar: () => import('@/components/common/ToolBar.vue')
   },
   computed: {
-    ...mapGetters({
-      gridData: 'filterData',
-      reload: 'reload'
-    }),
     defaultParams() {
       return this.initParams;
     },
     params() {
       return this.initParams;
     },
-    // sort() { return this.initSort },
     columns() {
       return this.initColumns;
     },
@@ -107,12 +90,22 @@ export default {
     }
   },
   methods: {
+    //执行父组件事件
+    eventCallBack(action) {
+      this.$parent[action].call(this, this.selectedRow);
+    },
+    //记录选中的行
+    handleSelect(val) {
+      this.selectedRow = val
+    },
     selectionChange(val) {
       this.$store.dispatch(GRID_FILTER.SET_MULIT, { filterID: this.filterID, items: val });
     },
+    //行点击事件
     cellClick(row, column, cell, event) {
       this.$emit('cellClick', row, column, cell, event);
     },
+    //排序改变事件
     sortChange(sort) {
       if (sort.prop != null) {
         let p = { filterID: this.filterID, sorts: [{ Field: sort.prop, SortBy: sort.order == 'ascending' ? 1 : 2 }] };
@@ -121,11 +114,13 @@ export default {
         });
       }
     },
+    //页改变事件
     currentChange(val) {
       this.$store.dispatch(GRID_FILTER.SET_PARAMS, { filterID: this.filterID, index: val }).then(() => {
         this.loadData();
       });
     },
+    //显示数量改变事件
     sizeChange(val) {
       this.params.size = val;
       this.params.index = 1;
@@ -134,6 +129,7 @@ export default {
         this.loadData();
       });
     },
+    //过滤事件
     filerChange(c) {
       let p = Object.assign({ filterID: this.filterID, index: 1 }, { conditions: this.defaultParams.conditions });
       p.conditions = p.conditions.concat(c);
@@ -141,33 +137,27 @@ export default {
         this.loadData();
       });
     },
+    //加载数据
     loadData() {
       if (this.$_.isNull(this.gridApi) || this.$_.isUndefined(this.gridApi)) {
         this.grid.data = this.initData;
         return;
       }
       this.loading = true;
-      this.$store
-        .dispatch(GRID_FILTER.QUERY, Object.assign({ filterID: this.filterID }, this.gridData[this.filterID].filter))
-        .then(() => {
-          setTimeout(() => {
-            this.grid = this.gridData[this.filterID].result;
-            this.loading = false;
-          }, 200);
-        })
-        .catch((error) => {
-          this.$message({
-            message: '加载出错',
-            type: 'error'
-          });
-          this.loading = false;
-        });
+      ajax.get(this.gridApi, { params: this.params }).then(res => {
+        this.loading = false;
+        this.grid.data = res.data.data.data;
+        this.grid.total = res.data.data.dataCount;
+      }).catch((error) => {
+        this.$message({ message: '加载出错', type: 'error' });
+        this.loading = false;
+      });
     },
+    //格式化
     gridFormatter(type) {
       if (typeof type == 'function') {
         return type;
-      }
-      if (typeof type == 'string') {
+      } else if (typeof type == 'string') {
         let formatters = {};
         formatters.shortDate = (row, column, cellVal) => {
           return this.$util.date.getDateTime(row.cellVal).format('yyyy-MM-dd');
@@ -176,10 +166,9 @@ export default {
           return this.$util.date.getDateTime(row.cellVal).toString();
         };
         if (typeof formatters[type] != 'undefined') return formatters[type];
+      } else {
+
       }
-    },
-    showUser(row) {
-      this.$confirmBox.showUserDetail(row.UserID, this);
     }
   },
   watch: {
@@ -190,20 +179,7 @@ export default {
     }
   },
   created() {
-    this.$store
-      .dispatch(
-        GRID_FILTER.SET_PARAMS,
-        Object.assign(
-          {
-            filterID: this.filterID,
-            api: this.gridApi
-          },
-          this.params
-        )
-      )
-      .then(() => {
-        this.loadData();
-      });
+    this.loadData();
   },
   mounted() { },
   destroyed() {

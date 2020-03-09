@@ -1,22 +1,27 @@
 <template>
-  <div class="table" v-loading="loading" element-loading-text="正在加载">
-    <div class="crumbs">
-      <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 菜单/按钮列表</el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
-    <div class="container">
-      <div class="handle-box">
-        <tool-bar @callBack="callBack" @search="search"></tool-bar>
-      </div>
-      <el-table :data="tableData" border highlight-current-row class="table" ref="table" @current-change="handleSelect">
+  <div class="io-grid" v-loading="loading">
+    <el-row class="g_search_nav">
+      <el-col :span="24" class="io-left io-left-div">
+        <!--过滤组件-->
+        <grid-filter :initColumns="columns" :gridID="gridID" class="io-left" @filterCallback="filerChange">
+        </grid-filter>
+        <!--操作按钮组件-->
+        <div class="io-right">
+          <tool-bar @callBack="eventCallBack"></tool-bar>
+        </div>
+      </el-col>
+    </el-row>
+    <div class="c-grid-table el-row">
+      <el-table class="pc-table-bgcolor" border :data="tableData" @current-change="handleSelect" highlight-current-row
+        row-key="Id" default-expand-all lazy :load="load"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
         <el-table-column label="菜单/按钮" width="" sortable>
           <template slot-scope="scope">
             <i class="fa" :class="scope.row.Icon"></i>
             {{scope.row.Name}}
           </template>
         </el-table-column>
-        <el-table-column prop="ParentName" label="父节点" width="" sortable>
+        <el-table-column prop="Name" label="菜单名称" width="" sortable>
         </el-table-column>
         <el-table-column prop="Code" label="路由地址" width="" sortable>
         </el-table-column>
@@ -41,89 +46,123 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="total">
-        </el-pagination>
-      </div>
+    </div>
+    <div class="pc-page io-grid-pagination">
+      <el-pagination class="pc-page-style" @size-change="sizeChange" @current-change="currentChange"
+        :page-sizes="pageSizes" :current-page="page" :page-size="size" layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
-import permissionApi from '../../api/permission.js'
+import permissionApi from '@/api/permission.js'
+import util from '@/lib/util.js'
 export default {
   name: 'permission',
   data() {
     return {
       loading: false,
-      tableData: [],
-      cur_page: 1,
+      page: 1,
       size: 10,
+      tableData: [],
       total: 0,
-      keyword: "",
-      selectedRow: null
+      pageSizes: [10, 20, 50],
+      selectedRow: {},
+      columns: [],
+      gridID: 'id',
+      conditions: [
+        {
+          Field: "ParentId",
+          DataType: util.query.dataType.int,
+          Option: util.query.opt.eq,
+          Value: 0
+        }, {
+          Field: "IsDeleted",
+          DataType: util.query.dataType.bool,
+          Option: util.query.opt.eq,
+          Value: false
+        }
+      ]
     }
   },
   created() {
-    this.getData()
+    this.columns = [
+      { prop: 'Name', label: '菜单名称', sortable: 'custom', width: '', type: 'string', isFilter: true },
+      { prop: 'Code', label: '路由地址', sortable: 'custom', width: '', type: 'string', isFilter: true }
+    ];
+    this.getPageData();
   },
   components: {
-    toolBar: () => import('@/components/common/ToolBar.vue')
+    toolBar: () => import('@/components/common/ToolBar.vue'),
+    gridFilter: () => import('@/components/common/filter/GridFilter.vue')
   },
   computed: {
   },
   methods: {
-    callBack(button) {
-      debugger
-      this.keyword = button.keyword;
-      this[button.action].apply(this, button);
+    eventCallBack(action) {
+      this[action].apply(this, this.selectedRow);
     },
     // 分页导航
     handleCurrentChange(val) {
-      this.cur_page = val;
-      this.getData();
+      this.page = val;
+      this.getPageData();
     },
-    // 获取数据
-    getData() {
+    load(tree, treeNode, resolve) {
+      permissionApi.getPermissionTree({ parentId: tree.Id }).then((res) => {
+        resolve(res.data.data);
+      });
+    },
+    // 获取分页数据
+    getPageData(page, size, conditions, sorts) {
       let that = this;
       that.loading = true;
-      permissionApi.getPageList({ page: that.cur_page, size: that.size, keyword: that.keyword }).then(res => {
-        that.tableData = res.data.data.data;
-        that.total = res.data.data.dataCount;
-      }).catch(err => {
-        that.$message({ message: '加载数据失败', type: 'error' });
-      }).finally(() => {
-        that.loading = false;
-      })
+
+      permissionApi.getPageList({ page: page, size: size, conditions: util.query.convert(conditions), sorts: util.query.convert(sorts) })
+        .then(res => {
+          that.tableData = res.data.data.data;
+          that.total = res.data.data.dataCount;
+        }).catch(err => {
+          that.$message({ message: that.$t("i18n.loadingfail"), type: 'error' });
+        }).finally(() => {
+          that.loading = false;
+        })
     },
-    // 搜索
-    search(keyword) {
-      this.keyword = keyword;
-      this.getData();
+    currentChange(val) {
+      this.page = val;
+      this.getPageData();
+    },
+    sizeChange(val) {
+      this.size = val;
+      this.getPageData(this.page);
+    },
+    filerChange(c) {
+      let filter = that.conditions.concat(c);
+      this.getPageData(that.page, that.size, filter, []);
     },
     // 添加
     handleAdd() {
       this.$router.push({ name: 'addOrEditPermission', params: { id: 0 } });
     },
     // 编辑
-    handleEdit(index, row) {
-      debugger
-      if (!this.selectedRow) {
+    handleEdit(row) {
+      if (!row) {
         this.$message({ message: "请先选择要编辑的数据", type: "warning" });
         return;
       }
 
-      let id = this.selectedRow.Id;
+      let id = row.Id;
       this.$router.push({ name: 'addOrEditPermission', params: { id: id } });
     },
     // 删除
-    handleDelete(index, row) {
-      if (!this.selectedRow) {
+    handleDelete(row) {
+      if (!row) {
         this.$message({ message: "请先选择要删除的数据", type: "warning" });
         return;
       }
 
-      let id = this.selectedRow.Id;
+      let id = row.Id;
       this.$confirm(this.$t("i18n.deletetips"), this.$t("i18n.tips"), {
         confirmButtonText: this.$t("i18n.confirm"),
         cancelButtonText: this.$t("i18n.cancel"),
@@ -144,7 +183,7 @@ export default {
       this.selectedRow = val
     },
     reload() {
-      this.getData();
+      this.getPageData();
     }
   }
 }

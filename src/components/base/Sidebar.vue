@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import bus from '../common/bus';
-import { i18n } from '../../locale/zh-CN'
+import bus from '@/components/common/bus';
+import { i18n } from '@/locale/zh-CN'
 
 export default {
   data() {

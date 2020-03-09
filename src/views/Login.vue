@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import authApi from "../api/auth"
-import userApi from "../api/user"
-import permissionApi from "../api/permission"
+import authApi from "@/api/auth"
+import userApi from "@/api/user"
+import permissionApi from "@/api/permission"
 
 export default {
   data: function () {

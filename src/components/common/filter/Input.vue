@@ -11,8 +11,7 @@
   </el-row>
 </template>
 <script>
-import { GRID_FILTER } from '../../../mutation-types.js'
-
+import util from '@/lib/util.js'
 export default {
   props: {
     column: { default: null },
@@ -23,7 +22,8 @@ export default {
       inputVal: '',
       selectVal: null,
       options: [],
-      isStr: ''
+      isStr: '',
+      dataType: '',
     }
   },
   computed: {
@@ -39,32 +39,35 @@ export default {
       if (this.inputVal.length == "") return null;
       return [{
         Field: this.myColumn.prop,
-        DataType: this.myColumn.type == 'string' ? this.$util.query.dataType.str : this.$util.query.dataType.num,
+        DataType: this.dataType == 'string' ? util.query.dataType.string : util.query.dataType.int,
         Option: this.selectVal,
         Value: this.inputVal
       }];
     },
     reset() {
-      this.myColumn.type == 'string' ? this.selectVal = this.$util.query.opt.like : this.selectVal == null;
+      this.myColumn.type == 'string' ? this.selectVal = util.query.opt.like : this.selectVal == null;
       this.inputVal = '';
     }
   },
   watch: {
   },
   created() {
-    if (this.myColumn.type == 'string') {
+    this.dataType = 'string|link|username|html'.split('|').indexOf(this.myColumn.type) > -1 ? 'string' : this.myColumn.type;
+
+    //his.myColumn.type == 'string'
+    if (this.dataType) {
       this.options = [
-        { label: '包含', value: this.$util.query.opt.like },
-        { label: '等于', value: this.$util.query.opt.eq }
+        { label: '包含', value: util.query.opt.like },
+        { label: '等于', value: util.query.opt.eq }
       ];
-      this.selectVal = this.$util.query.opt.like;
+      this.selectVal = util.query.opt.like;
     } else {
       this.options = [
-        { label: '等于', value: this.$util.query.opt.eq },
-        { label: '大于', value: this.$util.query.opt.gt },
-        { label: '大于等于', value: this.$util.query.opt.gte },
-        { label: '小于', value: this.$util.query.opt.lt },
-        { label: '小于等于', value: this.$util.query.opt.lte }
+        { label: '等于', value: util.query.opt.eq },
+        { label: '大于', value: util.query.opt.gt },
+        { label: '大于等于', value: util.query.opt.gte },
+        { label: '小于', value: util.query.opt.lt },
+        { label: '小于等于', value: util.query.opt.lte }
       ];
     }
   }

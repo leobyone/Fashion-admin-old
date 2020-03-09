@@ -17,10 +17,13 @@ const api = {
     return ajax.delete("permission/deleteall", { params: { ids: ids } });
   },
   getPageList(params) {
-    return ajax.get("permission/pagelist", { params: params });
+    return ajax.get("permission/pagelist", params);
   },
   getList(params) {
     return ajax.get("permission/list", { params: params });
+  },
+  getPermissionTree(params) {
+    return ajax.get("permission/tree", { params: params });
   },
   getPermissionIdsByRoleId(roleId) {
     return ajax.get("permission/permissionidsbyroleid", {

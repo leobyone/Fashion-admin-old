@@ -6,11 +6,10 @@
 </template>
 
 <script>
-import userApi from '@/api/user.js'
-import roleApi from '@/api/role.js'
+import userApi from '@/api/product.js'
 import util from '@/lib/util.js'
 export default {
-  name: 'user',
+  name: 'product',
   props: ['listID'],
   data() {
     return {

@@ -1,5 +1,5 @@
 import Json from "json3";
-import ajax from "../index.js";
+import ajax from "@/api/index.js";
 
 const api = {
   getList(api, p) {

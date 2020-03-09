@@ -56,6 +56,7 @@ export const i18n = {
   rolelist: "角色列表",
   rolename: "角色名称",
   isenabled: "是否启用",
+  creationtime: "创建时间",
   yes: "是",
   no: "否",
   description: "描述",

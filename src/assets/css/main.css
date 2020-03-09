@@ -30,7 +30,7 @@ a {
     padding-bottom: 30px;
     -webkit-transition: left .3s ease-in-out;
     transition: left .3s ease-in-out;
-    background: #f0f0f0;
+    /* background: #f0f0f0; */
 }
 
 .content {
@@ -47,9 +47,9 @@ a {
 
 .container {
     padding: 30px;
-    background: #fff;
+    /* background: #fff;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 5px; */
 }
 
 .crumbs {

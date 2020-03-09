@@ -11,8 +11,8 @@ function Query(api) {
     desc: 2
   };
   this.dataType = {
-    num: 1,
-    str: 2,
+    int: 1,
+    string: 2,
     date: 3,
     bool: 4
   };
@@ -224,7 +224,7 @@ function Query(api) {
     for (let i = 0; i < temp.length; i++) {
       this.conditions.push({
         Field: temp[i][0],
-        DataType: typeof t != 'undefined' ? t : this.dataType.str,
+        DataType: typeof t != 'undefined' ? t : this.dataType.string,
         Option: o,
         Value: temp[i][1]
       });
